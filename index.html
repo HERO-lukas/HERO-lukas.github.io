@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLZ Radius Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="logo">
+                <span class="hero-badge">HERO</span>
+                <h1>PLZ Radius Dashboard</h1>
+            </div>
+            <p class="subtitle">Postleitzahlen im Umkreis finden</p>
+        </header>
+
+        <main>
+            <div class="panel left-panel">
+                <div class="input-section">
+                    <h2>Suche</h2>
+                    <div class="form-group">
+                        <label for="plz-input">Postleitzahl (PLZ)</label>
+                        <input type="text" id="plz-input" placeholder="z.B. 10115" maxlength="5" />
+                    </div>
+                    <div class="form-group">
+                        <label for="radius-input">Radius (km)</label>
+                        <input type="number" id="radius-input" placeholder="z.B. 25" min="1" max="500" value="25" />
+                    </div>
+                    <button id="search-btn" onclick="searchPLZ()">🔍 Suchen</button>
+                    <button id="export-btn" onclick="exportCSV()" style="display:none;">📥 CSV Export</button>
+                </div>
+
+                <div class="results-section" id="results-section" style="display:none;">
+                    <h2>Ergebnisse</h2>
+                    <p id="results-summary"></p>
+                    <div id="plz-list"></div>
+                </div>
+            </div>
+
+            <div class="panel right-panel">
+                <div id="map"></div>
+            </div>
+        </main>
+
+        <div id="loading" style="display:none;">
+            <div class="spinner"></div>
+            <p>Daten werden geladen...</p>
+        </div>
+
+        <div id="error-msg" style="display:none;"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
