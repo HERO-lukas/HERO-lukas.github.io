@@ -7,159 +7,116 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #1a1a1a; color: #f0f0f0; min-height: 100vh; }
 
         .app-header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-bottom: 1px solid #334155;
-            padding: 20px 32px;
-            display: flex; align-items: center; gap: 16px;
+            background: #111111; border-bottom: 1px solid #2a2a2a;
+            padding: 16px 32px; display: flex; align-items: center; gap: 16px;
         }
         .app-header h1 { font-size: 1.5rem; font-weight: 700; }
-        .app-header h1 span { color: #38bdf8; }
-        .app-header .badge {
-            background: #1e3a5f; color: #38bdf8; font-size: 0.7rem;
-            padding: 3px 10px; border-radius: 999px; font-weight: 600;
-        }
-        .app-header .status {
-            margin-left: auto; font-size: 0.78rem; color: #64748b;
-        }
-        .app-header .status .dot {
-            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-            margin-right: 6px; background: #ef4444;
-        }
+        .app-header h1 span { color: #FFE600; }
+        .app-header .badge { background: #2a2600; color: #FFE600; font-size: 0.7rem; padding: 3px 10px; border-radius: 999px; font-weight: 600; }
+        .app-header .status { margin-left: auto; font-size: 0.78rem; color: #888888; }
+        .app-header .status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: #ef4444; }
         .app-header .status .dot.ready { background: #22c55e; }
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            height: calc(100vh - 73px);
-        }
+        .main-grid { display: grid; grid-template-columns: 420px 1fr; height: calc(100vh - 65px); }
 
-        .sidebar {
-            background: #1e293b; border-right: 1px solid #334155;
-            display: flex; flex-direction: column; overflow: hidden;
-        }
-        .sidebar-section { padding: 20px 24px; border-bottom: 1px solid #334155; }
-        .sidebar-section label {
-            display: block; font-size: 0.78rem; font-weight: 600;
-            color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
-        }
+        .sidebar { background: #1a1a1a; border-right: 1px solid #2a2a2a; display: flex; flex-direction: column; overflow: hidden; }
+        .sidebar-section { padding: 14px 20px; border-bottom: 1px solid #2a2a2a; flex-shrink: 0; }
+        .sidebar-section label { display: block; font-size: 0.75rem; font-weight: 600; color: #999999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
 
         .search-input-wrap { position: relative; }
-        .search-input-wrap svg {
-            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-            width: 18px; height: 18px; color: #64748b;
-        }
-        .search-input-wrap input {
-            width: 100%; padding: 12px 14px 12px 40px;
-            background: #0f172a; border: 1px solid #334155; border-radius: 10px;
-            color: #f1f5f9; font-size: 0.95rem; outline: none; transition: border-color .2s;
-        }
-        .search-input-wrap input:focus { border-color: #38bdf8; }
-        .search-input-wrap input::placeholder { color: #475569; }
+        .search-input-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #888888; }
+        .search-input-wrap input { width: 100%; padding: 10px 12px 10px 38px; background: #111111; border: 1px solid #2a2a2a; border-radius: 10px; color: #f0f0f0; font-size: 0.9rem; outline: none; transition: border-color .2s; }
+        .search-input-wrap input:focus { border-color: #FFE600; }
+        .search-input-wrap input::placeholder { color: #555555; }
 
-        .slider-wrap { margin-top: 4px; }
+        .bl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 2px; }
+        .bl-btn { background: #111111; border: 1px solid #2a2a2a; border-radius: 7px; color: #999999; font-size: 0.68rem; font-weight: 600; padding: 5px 4px; cursor: pointer; text-align: center; transition: all .15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bl-btn:hover { border-color: #FFE600; color: #f0f0f0; }
+        .bl-btn.active { background: #2a2600; border-color: #FFE600; color: #FFE600; }
+        .bl-btn.active:hover { background: #1f1c00; }
+
+        .oder-divider { display: flex; align-items: center; gap: 10px; padding: 0 20px; flex-shrink: 0; height: 28px; }
+        .oder-line { flex: 1; height: 1px; background: #2a2a2a; }
+        .oder-label { font-size: 0.68rem; font-weight: 700; color: #444444; letter-spacing: 0.1em; user-select: none; }
+
+        .slider-wrap { margin-top: 2px; }
         .slider-header { display: flex; justify-content: space-between; align-items: baseline; }
-        .slider-value { font-size: 1.4rem; font-weight: 700; color: #38bdf8; }
-        .slider-value small { font-size: 0.8rem; font-weight: 400; color: #64748b; }
-        input[type=range] {
-            -webkit-appearance: none; width: 100%; height: 6px;
-            background: #334155; border-radius: 99px; outline: none; margin-top: 12px;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 22px; height: 22px;
-            background: #38bdf8; border-radius: 50%; cursor: pointer;
-            box-shadow: 0 0 8px rgba(56,189,248,.4);
-        }
+        .slider-value { font-size: 1.3rem; font-weight: 700; color: #FFE600; }
+        .slider-value small { font-size: 0.75rem; font-weight: 400; color: #888888; }
+        input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; background: #2a2a2a; border-radius: 99px; outline: none; margin-top: 10px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #FFE600; border-radius: 50%; cursor: pointer; box-shadow: 0 0 8px rgba(255,230,0,.4); }
 
-        .btn-search {
-            width: 100%; padding: 13px; margin-top: 18px;
-            background: linear-gradient(135deg, #0ea5e9, #2563eb); color: #fff;
-            font-size: 0.95rem; font-weight: 600; border: none; border-radius: 10px;
-            cursor: pointer; transition: opacity .2s;
-        }
+        .btn-search { width: 100%; padding: 11px; margin-top: 12px; background: #FFE600; color: #000000; font-size: 0.9rem; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; transition: opacity .2s; }
         .btn-search:hover { opacity: .9; }
         .btn-search:disabled { opacity: .5; cursor: not-allowed; }
 
+        .section-disabled { opacity: 0.35; pointer-events: none; transition: opacity .25s; }
+        .section-enabled { opacity: 1; pointer-events: auto; transition: opacity .25s; }
+
+        .filter-panel { padding: 12px 20px; border-bottom: 1px solid #2a2a2a; flex-shrink: 0; display: none; }
+        .filter-panel.visible { display: block; }
+        .filter-panel label { display: block; font-size: 0.75rem; font-weight: 600; color: #999999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .filter-bl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        .filter-bl-item { display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500; background: #111111; border: 1px solid #2a2a2a; transition: all .15s; user-select: none; }
+        .filter-bl-item:hover { border-color: #555555; }
+        .filter-bl-item input[type=checkbox] { width: 13px; height: 13px; accent-color: #FFE600; cursor: pointer; flex-shrink: 0; margin: 0; }
+        .filter-bl-item.checked { background: #2a260033; border-color: #FFE60055; color: #FFE600; }
+        .filter-bl-count { margin-left: auto; font-size: 0.68rem; background: #2a2600; padding: 1px 6px; border-radius: 99px; color: #FFE600; }
+        .filter-actions { display: flex; gap: 6px; margin-top: 8px; }
+        .btn-filter-apply { flex: 1; padding: 7px; border: none; border-radius: 7px; background: #FFE600; color: #000000; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+        .btn-filter-apply:hover { opacity: .9; }
+        .btn-filter-reset { padding: 7px 12px; border: 1px solid #2a2a2a; border-radius: 7px; background: transparent; color: #999999; font-size: 0.78rem; cursor: pointer; }
+        .btn-filter-reset:hover { border-color: #555555; color: #f0f0f0; }
+
         .results-area { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-        .results-header {
-            padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #334155; flex-shrink: 0;
-        }
-        .results-header h3 { font-size: 0.95rem; }
-        .results-header h3 span { color: #38bdf8; }
+        .results-header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a2a; flex-shrink: 0; gap: 8px; }
+        .results-header h3 { font-size: 0.9rem; white-space: nowrap; }
+        .results-header h3 span { color: #FFE600; }
+        .results-header-btns { display: flex; gap: 6px; flex-shrink: 0; }
+        .btn-csv { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; font-size: 0.75rem; font-weight: 600; background: #2a2600; color: #FFE600; border: 1px solid #FFE60033; border-radius: 7px; cursor: pointer; transition: background .2s; white-space: nowrap; }
+        .btn-csv:hover { background: #1f1c00; }
+        .btn-filter-toggle { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; font-size: 0.75rem; font-weight: 600; background: #111111; color: #999999; border: 1px solid #2a2a2a; border-radius: 7px; cursor: pointer; transition: all .2s; white-space: nowrap; }
+        .btn-filter-toggle:hover { border-color: #FFE600; color: #FFE600; }
+        .btn-filter-toggle.active { background: #2a2600; border-color: #FFE600; color: #FFE600; }
 
-        .btn-csv {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 7px 14px; font-size: 0.78rem; font-weight: 600;
-            background: #166534; color: #4ade80; border: 1px solid #22c55e33;
-            border-radius: 8px; cursor: pointer; transition: background .2s;
-        }
-        .btn-csv:hover { background: #15803d; }
-
-        .results-list { flex: 1; overflow-y: auto; padding: 8px 16px; }
+        .results-list { flex: 1; overflow-y: auto; padding: 6px 14px; }
         .results-list::-webkit-scrollbar { width: 6px; }
-        .results-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+        .results-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 99px; }
+        .plz-chip { display: inline-flex; align-items: center; gap: 5px; background: #111111; border: 1px solid #2a2a2a; border-radius: 7px; padding: 5px 10px; margin: 3px; font-size: 0.8rem; font-weight: 500; }
+        .plz-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: #FFE600; flex-shrink: 0; }
 
-        .plz-chip {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: #0f172a; border: 1px solid #334155; border-radius: 8px;
-            padding: 6px 12px; margin: 4px; font-size: 0.82rem; font-weight: 500;
-        }
-        .plz-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: #38bdf8; }
+        .stats-bar { padding: 10px 20px; border-top: 1px solid #2a2a2a; display: flex; gap: 16px; font-size: 0.75rem; color: #888888; flex-shrink: 0; flex-wrap: wrap; }
+        .stats-bar strong { color: #f0f0f0; }
 
-        .stats-bar {
-            padding: 14px 24px; border-top: 1px solid #334155;
-            display: flex; gap: 24px; font-size: 0.78rem; color: #64748b; flex-shrink: 0;
-        }
-        .stats-bar strong { color: #e2e8f0; }
+        .kreise-list { padding: 6px 14px; max-height: 120px; overflow-y: auto; border-top: 1px solid #2a2a2a; flex-shrink: 0; }
+        .kreise-list::-webkit-scrollbar { width: 6px; }
+        .kreise-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 99px; }
+        .kreis-tag { display: inline-block; background: #2a2600; color: #FFE600; border: 1px solid #FFE60033; border-radius: 6px; padding: 2px 8px; margin: 2px; font-size: 0.72rem; font-weight: 500; }
+
+        .mode-badge { display: inline-flex; align-items: center; gap: 5px; background: #2a2600; border: 1px solid #FFE60055; color: #FFE600; border-radius: 6px; padding: 2px 8px; font-size: 0.7rem; font-weight: 600; margin-left: 6px; }
 
         .map-container { position: relative; }
         #map { width: 100%; height: 100%; }
-
-        .loader-overlay {
-            position: absolute; inset: 0; background: rgba(15,23,42,.85);
-            display: none; align-items: center; justify-content: center;
-            z-index: 9999; flex-direction: column; gap: 12px;
-        }
+        .loader-overlay { position: absolute; inset: 0; background: rgba(15,23,42,.85); display: none; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 12px; }
         .loader-overlay.active { display: flex; }
-        .spinner {
-            width: 40px; height: 40px; border: 3px solid #334155;
-            border-top-color: #38bdf8; border-radius: 50%;
-            animation: spin .8s linear infinite;
-        }
+        .spinner { width: 40px; height: 40px; border: 3px solid #2a2a2a; border-top-color: #FFE600; border-radius: 50%; animation: spin .8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loader-text { color:#94a3b8; font-size:.85rem; }
+        .loader-text { color:#999999; font-size:.85rem; }
 
-        .legend {
-            position: absolute; bottom: 20px; right: 20px; z-index: 1000;
-            background: #1e293bee; border: 1px solid #334155; border-radius: 12px;
-            padding: 14px 18px; font-size: 0.78rem; color: #94a3b8;
-        }
+        .legend { position: absolute; bottom: 20px; right: 20px; z-index: 1000; background: #111111ee; border: 1px solid #2a2a2a; border-radius: 12px; padding: 12px 16px; font-size: 0.75rem; color: #999999; }
         .legend-item { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
         .legend-swatch { width: 14px; height: 14px; border-radius: 4px; }
 
-        .toast {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: #dc2626; color: #fff; padding: 12px 24px; border-radius: 10px;
-            font-size: 0.85rem; z-index: 10000; display: none;
-        }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 0.85rem; z-index: 10000; display: none; }
         .toast.show { display: block; animation: fadeInUp .3s; }
         @keyframes fadeInUp { from { opacity:0; transform:translate(-50%,12px); } to { opacity:1; transform:translate(-50%,0); } }
 
-        .kreise-list { padding: 8px 16px; max-height: 150px; overflow-y: auto; border-top: 1px solid #334155; flex-shrink: 0; }
-        .kreise-list::-webkit-scrollbar { width: 6px; }
-        .kreise-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
-        .kreis-tag {
-            display: inline-block; background: #422006; color: #facc15;
-            border: 1px solid #facc1533; border-radius: 6px;
-            padding: 3px 10px; margin: 3px; font-size: 0.75rem; font-weight: 500;
-        }
-
         @media (max-width: 900px) {
             .main-grid { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-            .sidebar { max-height: 50vh; }
+            .sidebar { max-height: 60vh; }
         }
     </style>
 </head>
@@ -173,14 +130,31 @@
 
 <div class="main-grid">
     <aside class="sidebar">
-        <div class="sidebar-section">
+
+        <!-- 1. Bundesland Buttons -->
+        <div class="sidebar-section" id="sectionBL">
+            <label>Bundesländer direkt auswählen <span style="color:#666;font-weight:400;text-transform:none;font-size:0.7rem">(alle PLZ)</span></label>
+            <div class="bl-grid" id="blGrid"></div>
+        </div>
+
+        <!-- 2. ODER Trennlinie -->
+        <div class="oder-divider">
+            <span class="oder-line"></span>
+            <span class="oder-label">ODER</span>
+            <span class="oder-line"></span>
+        </div>
+
+        <!-- 3. Suchleiste -->
+        <div class="sidebar-section" id="sectionSearch" style="border-bottom:none;padding-bottom:6px">
             <label>Standort eingeben</label>
             <div class="search-input-wrap">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="text" id="locationInput" placeholder="PLZ, Stadt oder Adresse…" autocomplete="off"/>
             </div>
         </div>
-        <div class="sidebar-section">
+
+        <!-- 4. Umkreis + Such-Button -->
+        <div class="sidebar-section" id="sectionRadius" style="padding-top:6px">
             <div class="slider-wrap">
                 <div class="slider-header">
                     <label style="margin:0">Umkreis</label>
@@ -188,16 +162,30 @@
                 </div>
                 <input type="range" id="rangeSlider" min="1" max="200" value="25" />
             </div>
-            <button class="btn-search" id="btnSearch" disabled>🔍 Suche starten</button>
+            <button class="btn-search" id="btnSearch" disabled>🔍 Radius-Suche starten</button>
         </div>
 
+        <!-- Filter Panel -->
+        <div class="filter-panel" id="filterPanel">
+            <label>🎛 Nach Bundesland filtern</label>
+            <div class="filter-bl-grid" id="filterBLGrid"></div>
+            <div class="filter-actions">
+                <button class="btn-filter-apply" id="btnFilterApply">Anwenden</button>
+                <button class="btn-filter-reset" id="btnFilterReset">Alle</button>
+            </div>
+        </div>
+
+        <!-- Results -->
         <div class="results-area" id="resultsArea" style="display:none">
             <div class="results-header">
-                <h3>Gefundene PLZ: <span id="plzCount">0</span></h3>
-                <button class="btn-csv" id="btnCsv">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    CSV Download
-                </button>
+                <h3>PLZ: <span id="plzCount">0</span> <span id="modeBadge"></span></h3>
+                <div class="results-header-btns">
+                    <button class="btn-filter-toggle" id="btnFilterToggle" style="display:none">🎛 Filter</button>
+                    <button class="btn-csv" id="btnCsv">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        CSV
+                    </button>
+                </div>
             </div>
             <div class="results-list" id="resultsList"></div>
             <div class="kreise-list" id="kreiseList"></div>
@@ -216,9 +204,9 @@
             <span class="loader-text" id="loaderText">Suche läuft…</span>
         </div>
         <div class="legend">
-            <div style="font-weight:600;color:#e2e8f0">Legende</div>
+            <div style="font-weight:600;color:#f0f0f0">Legende</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#ef4444"></div> Suchzentrum</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:#38bdf8"></div> Suchradius</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#FFE600"></div> Suchradius</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#f472b6"></div> PLZ Punkte</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#facc15;opacity:.6"></div> Landkreise</div>
         </div>
@@ -230,14 +218,31 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function() {
-    // ─── State ───
     let map, radiusCircle, markersLayer, kreisLayer;
-    let foundPLZData = [];
-    let plzDatabase = null;
-    let kreisGeoJSON = null;
-    let dataReady = false;
+    let foundPLZData = [], filteredPLZData = [];
+    let plzDatabase = null, kreisGeoJSON = null;
+    let dataReady = false, currentMode = 'radius';
+    let plzBLMap = {};
 
-    // ─── Init Map ───
+    const BUNDESLAENDER = [
+        { name: 'Bayern', short: 'BY' },
+        { name: 'Baden-Württemberg', short: 'BW' },
+        { name: 'Berlin', short: 'BE' },
+        { name: 'Brandenburg', short: 'BB' },
+        { name: 'Bremen', short: 'HB' },
+        { name: 'Hamburg', short: 'HH' },
+        { name: 'Hessen', short: 'HE' },
+        { name: 'Mecklenburg-Vorpommern', short: 'MV' },
+        { name: 'Niedersachsen', short: 'NI' },
+        { name: 'Nordrhein-Westfalen', short: 'NW' },
+        { name: 'Rheinland-Pfalz', short: 'RP' },
+        { name: 'Saarland', short: 'SL' },
+        { name: 'Sachsen', short: 'SN' },
+        { name: 'Sachsen-Anhalt', short: 'ST' },
+        { name: 'Schleswig-Holstein', short: 'SH' },
+        { name: 'Thüringen', short: 'TH' },
+    ];
+
     map = L.map('map', { zoomControl: true }).setView([51.1657, 10.4515], 6);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
@@ -245,7 +250,6 @@
     markersLayer = L.layerGroup().addTo(map);
     kreisLayer = L.layerGroup().addTo(map);
 
-    // ─── UI ───
     const $ = id => document.getElementById(id);
     const locationInput = $('locationInput');
     const rangeSlider = $('rangeSlider');
@@ -253,292 +257,291 @@
     const btnSearch = $('btnSearch');
     const loader = $('loader');
     const loaderText = $('loaderText');
+    const filterPanel = $('filterPanel');
+    const btnFilterToggle = $('btnFilterToggle');
 
+    const sectionBL     = $('sectionBL');
+    const sectionSearch = $('sectionSearch');
+    const sectionRadius = $('sectionRadius');
+
+    function setSearchActive() {
+        sectionBL.classList.add('section-disabled');
+        sectionBL.classList.remove('section-enabled');
+    }
+    function setBLActive() {
+        sectionSearch.classList.add('section-disabled');
+        sectionSearch.classList.remove('section-enabled');
+        sectionRadius.classList.add('section-disabled');
+        sectionRadius.classList.remove('section-enabled');
+    }
+    function resetAll() {
+        [sectionBL, sectionSearch, sectionRadius].forEach(s => {
+            s.classList.remove('section-disabled');
+            s.classList.add('section-enabled');
+        });
+    }
+
+    locationInput.addEventListener('input', () => {
+        if (locationInput.value.trim().length > 0) setSearchActive();
+        else if (selectedBL.size === 0) resetAll();
+    });
+    locationInput.addEventListener('keydown', e => { if (e.key === 'Enter' && dataReady) btnSearch.click(); });
     rangeSlider.addEventListener('input', () => {
         rangeDisplay.innerHTML = rangeSlider.value + ' <small>km</small>';
     });
-    locationInput.addEventListener('keydown', e => { if (e.key === 'Enter' && dataReady) btnSearch.click(); });
 
-    function toast(msg) {
+    function toast(msg, color) {
         const t = $('toast');
+        t.style.background = color || '#dc2626';
         t.textContent = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 4000);
     }
-
     function setStatus(ready, text) {
         $('statusDot').className = 'dot' + (ready ? ' ready' : '');
         $('statusText').textContent = text;
     }
 
-    // ─── Haversine ───
     function haversine(lat1, lon1, lat2, lon2) {
         const R = 6371, toRad = x => x * Math.PI / 180;
-        const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+        const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    // ─── Point in Polygon (ray casting) ───
     function pointInRing(lat, lon, ring) {
         let inside = false;
-        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-            const xi = ring[i][1], yi = ring[i][0]; // GeoJSON = [lon, lat]
-            const xj = ring[j][1], yj = ring[j][0];
-            if (((yi > lon) !== (yj > lon)) && (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi)) {
-                inside = !inside;
-            }
+        for (let i=0, j=ring.length-1; i<ring.length; j=i++) {
+            const xi=ring[i][1], yi=ring[i][0], xj=ring[j][1], yj=ring[j][0];
+            if (((yi>lon)!==(yj>lon)) && (lat < (xj-xi)*(lon-yi)/(yj-yi)+xi)) inside=!inside;
         }
         return inside;
     }
-
     function pointInGeometry(lat, lon, geometry) {
         if (!geometry) return false;
-        if (geometry.type === 'Polygon') {
-            return pointInRing(lat, lon, geometry.coordinates[0]);
-        }
-        if (geometry.type === 'MultiPolygon') {
-            return geometry.coordinates.some(poly => pointInRing(lat, lon, poly[0]));
-        }
+        if (geometry.type==='Polygon') return pointInRing(lat, lon, geometry.coordinates[0]);
+        if (geometry.type==='MultiPolygon') return geometry.coordinates.some(p => pointInRing(lat, lon, p[0]));
         return false;
     }
 
-    // ─── Load PLZ Database ───
-    async function loadPLZDatabase() {
-        setStatus(false, 'PLZ-Datenbank wird geladen…');
-        const url = 'https://raw.githubusercontent.com/WZBSocialScienceCenter/plz_geocoord/master/plz_geocoord.csv';
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('PLZ-Daten konnten nicht geladen werden');
-        const text = await res.text();
-        const lines = text.trim().split('\n');
-        plzDatabase = [];
-        for (let i = 1; i < lines.length; i++) {
-            const parts = lines[i].split(',');
-            if (parts.length < 3) continue;
-            const plz = parts[0].replace(/"/g, '').trim();
-            const lat = parseFloat(parts[1]);
-            const lon = parseFloat(parts[2]);
-            if (!isNaN(lat) && !isNaN(lon) && plz.length >= 4) {
-                plzDatabase.push({ plz, lat, lon });
+    function buildPLZBLMap() {
+        if (!kreisGeoJSON || !plzDatabase) return;
+        const bbox = kreisGeoJSON.features.map(f => {
+            let coords = f.geometry.type==='Polygon' ? f.geometry.coordinates[0] : f.geometry.coordinates.flat(2);
+            let minLat=90,maxLat=-90,minLon=180,maxLon=-180;
+            for (const c of coords) { if(c[1]<minLat)minLat=c[1]; if(c[1]>maxLat)maxLat=c[1]; if(c[0]<minLon)minLon=c[0]; if(c[0]>maxLon)maxLon=c[0]; }
+            return { f, minLat, maxLat, minLon, maxLon };
+        });
+        for (const p of plzDatabase) {
+            for (const k of bbox.filter(k => p.lat>=k.minLat && p.lat<=k.maxLat && p.lon>=k.minLon && p.lon<=k.maxLon)) {
+                const bl = k.f.properties.NAME_1 || k.f.properties.state || '';
+                if (bl && pointInGeometry(p.lat, p.lon, k.f.geometry)) { plzBLMap[p.plz]=bl; break; }
             }
         }
-        console.log('PLZ loaded:', plzDatabase.length);
     }
 
-    // ─── Load Kreise GeoJSON ───
+    async function loadPLZDatabase() {
+        setStatus(false, 'PLZ-Datenbank wird geladen…');
+        const res = await fetch('https://raw.githubusercontent.com/WZBSocialScienceCenter/plz_geocoord/master/plz_geocoord.csv');
+        if (!res.ok) throw new Error('PLZ-Daten konnten nicht geladen werden');
+        const lines = (await res.text()).trim().split('\n');
+        plzDatabase = [];
+        for (let i=1; i<lines.length; i++) {
+            const p = lines[i].split(',');
+            if (p.length < 3) continue;
+            const plz = p[0].replace(/"/g,'').trim(), lat=parseFloat(p[1]), lon=parseFloat(p[2]);
+            if (!isNaN(lat) && !isNaN(lon) && plz.length>=4) plzDatabase.push({plz,lat,lon});
+        }
+    }
+
     async function loadKreisGeoJSON() {
         setStatus(false, 'Landkreis-Grenzen werden geladen…');
-        // Try multiple sources
-        const urls = [
+        for (const url of [
             'https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/4_kreise/4_niedrig.geo.json',
             'https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/4_kreise/3_mittel.geo.json'
-        ];
-        for (const url of urls) {
-            try {
-                const res = await fetch(url);
-                if (!res.ok) continue;
-                kreisGeoJSON = await res.json();
-                console.log('Kreise loaded:', kreisGeoJSON.features.length, 'from', url);
-                return;
-            } catch (e) { console.warn('Failed:', url, e); }
+        ]) {
+            try { const res=await fetch(url); if(!res.ok) continue; kreisGeoJSON=await res.json(); return; } catch(e){}
         }
-        console.warn('Could not load Kreise GeoJSON');
     }
 
-    // ─── Init Data ───
     async function initData() {
         try {
             await Promise.all([loadPLZDatabase(), loadKreisGeoJSON()]);
+            buildPLZBLMap();
             dataReady = true;
             btnSearch.disabled = false;
-            const plzCount = plzDatabase ? plzDatabase.length : 0;
-            const kreisCount = kreisGeoJSON ? kreisGeoJSON.features.length : 0;
-            setStatus(true, plzCount + ' PLZ · ' + kreisCount + ' Kreise geladen');
-        } catch (e) {
-            setStatus(false, 'Fehler beim Laden: ' + e.message);
-            toast('Daten konnten nicht geladen werden: ' + e.message);
-        }
+            buildBLButtons();
+            setStatus(true, (plzDatabase?.length||0) + ' PLZ · ' + (kreisGeoJSON?.features?.length||0) + ' Kreise geladen');
+        } catch(e) { setStatus(false, 'Fehler: ' + e.message); toast(e.message); }
     }
     initData();
 
-    // ─── Geocode ───
+    const selectedBL = new Set();
+    function buildBLButtons() {
+        const grid = $('blGrid');
+        grid.innerHTML = '';
+        BUNDESLAENDER.forEach(bl => {
+            const btn = document.createElement('button');
+            btn.className = 'bl-btn'; btn.title = bl.name; btn.textContent = bl.short; btn.dataset.name = bl.name;
+            btn.addEventListener('click', () => {
+                if (selectedBL.has(bl.name)) { selectedBL.delete(bl.name); btn.classList.remove('active'); }
+                else { selectedBL.add(bl.name); btn.classList.add('active'); }
+                if (selectedBL.size > 0) setBLActive();
+                else if (locationInput.value.trim().length === 0) resetAll();
+            });
+            grid.appendChild(btn);
+        });
+        const btnBL = document.createElement('button');
+        btnBL.id = 'btnBLSearch'; btnBL.className = 'btn-search'; btnBL.style.marginTop = '8px';
+        btnBL.textContent = '🗺 Bundesland-PLZ laden';
+        btnBL.addEventListener('click', runBLSearch);
+        $('sectionBL').appendChild(btnBL);
+    }
+
+    async function runBLSearch() {
+        if (!dataReady) { toast('Daten werden noch geladen…'); return; }
+        if (selectedBL.size===0) { toast('Bitte mindestens ein Bundesland auswählen'); return; }
+        loader.classList.add('active'); loaderText.textContent = 'PLZ werden gefiltert…';
+        await new Promise(r=>setTimeout(r,40));
+        currentMode = 'bundesland';
+        markersLayer.clearLayers(); kreisLayer.clearLayers();
+        if (radiusCircle) { map.removeLayer(radiusCircle); radiusCircle=null; }
+        try {
+            const matches = plzDatabase.filter(p => {
+                const bl = plzBLMap[p.plz]; if (!bl) return false;
+                for (const s of selectedBL) if (bl.toLowerCase().includes(s.toLowerCase())||s.toLowerCase().includes(bl.toLowerCase())) return true;
+                return false;
+            }).map(p=>({...p,distance:0}));
+            foundPLZData = filteredPLZData = matches;
+            for (const p of matches) L.circleMarker([p.lat,p.lon],{radius:3,color:'#f472b6',fillColor:'#f472b6',fillOpacity:.7,weight:1}).addTo(markersLayer);
+            if (matches.length) { const lats=matches.map(p=>p.lat),lons=matches.map(p=>p.lon); map.fitBounds([[Math.min(...lats),Math.min(...lons)],[Math.max(...lats),Math.max(...lons)]],{padding:[30,30]}); }
+            filterPanel.classList.remove('visible'); btnFilterToggle.style.display='none';
+            $('modeBadge').innerHTML='<span class="mode-badge">🗺 Bundesland-Modus</span>';
+            showResults(matches,[],new Set(selectedBL));
+        } catch(e) { toast('Fehler: '+e.message); }
+        finally { loader.classList.remove('active'); }
+    }
+
     async function geocode(query) {
-        const url = 'https://nominatim.openstreetmap.org/search?format=json&countrycodes=de&limit=1&q=' + encodeURIComponent(query);
-        const res = await fetch(url, { headers: { 'Accept-Language': 'de' } });
+        const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&countrycodes=de&limit=1&q='+encodeURIComponent(query),{headers:{'Accept-Language':'de'}});
         if (!res.ok) throw new Error('Geocoding fehlgeschlagen');
         const data = await res.json();
         if (!data.length) throw new Error('Ort nicht gefunden');
-        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), display: data[0].display_name };
+        return {lat:parseFloat(data[0].lat),lon:parseFloat(data[0].lon),display:data[0].display_name};
     }
 
-    // ─── Find Kreise that contain matched PLZ points ───
     function findKreiseForPoints(points) {
-        if (!kreisGeoJSON || !kreisGeoJSON.features) return [];
-        const matched = new Map(); // kreisName -> feature
-
-        // Build a simple spatial index: only test kreise whose bbox overlaps with points
-        // First get bounding box of all points
-        let minLat = 90, maxLat = -90, minLon = 180, maxLon = -180;
-        for (const p of points) {
-            if (p.lat < minLat) minLat = p.lat;
-            if (p.lat > maxLat) maxLat = p.lat;
-            if (p.lon < minLon) minLon = p.lon;
-            if (p.lon > maxLon) maxLon = p.lon;
-        }
-
-        // Pre-filter features by bbox
-        const candidateFeatures = kreisGeoJSON.features.filter(f => {
+        if (!kreisGeoJSON?.features) return [];
+        const matched = new Map();
+        let minLat=90,maxLat=-90,minLon=180,maxLon=-180;
+        for (const p of points) { if(p.lat<minLat)minLat=p.lat; if(p.lat>maxLat)maxLat=p.lat; if(p.lon<minLon)minLon=p.lon; if(p.lon>maxLon)maxLon=p.lon; }
+        const candidates = kreisGeoJSON.features.filter(f => {
             if (!f.geometry) return false;
-            // Compute rough bbox of feature
-            let coords;
-            if (f.geometry.type === 'Polygon') coords = f.geometry.coordinates[0];
-            else if (f.geometry.type === 'MultiPolygon') coords = f.geometry.coordinates.flat(2);
-            else return false;
-            if (!coords || !coords.length) return false;
-
-            let fMinLat = 90, fMaxLat = -90, fMinLon = 180, fMaxLon = -180;
-            for (const c of coords) {
-                if (c[1] < fMinLat) fMinLat = c[1];
-                if (c[1] > fMaxLat) fMaxLat = c[1];
-                if (c[0] < fMinLon) fMinLon = c[0];
-                if (c[0] > fMaxLon) fMaxLon = c[0];
-            }
-            // Check bbox overlap
-            return !(fMaxLat < minLat || fMinLat > maxLat || fMaxLon < minLon || fMinLon > maxLon);
+            const coords = f.geometry.type==='Polygon'?f.geometry.coordinates[0]:f.geometry.type==='MultiPolygon'?f.geometry.coordinates.flat(2):null;
+            if (!coords) return false;
+            let a=90,b=-90,c=180,d=-180;
+            for(const x of coords){if(x[1]<a)a=x[1];if(x[1]>b)b=x[1];if(x[0]<c)c=x[0];if(x[0]>d)d=x[0];}
+            return !(b<minLat||a>maxLat||d<minLon||c>maxLon);
         });
-
-        console.log('Candidate Kreise:', candidateFeatures.length);
-
-        // Sample points to keep it fast (max 300 points)
-        const step = Math.max(1, Math.floor(points.length / 300));
-        const sampledPoints = points.filter((_, i) => i % step === 0);
-
-        for (const p of sampledPoints) {
-            for (const f of candidateFeatures) {
-                const name = f.properties.NAME_3 || f.properties.name || f.properties.NAME_2 || f.properties.GEN || f.properties.Name || '';
-                if (matched.has(name)) continue; // already matched
-                if (pointInGeometry(p.lat, p.lon, f.geometry)) {
-                    matched.set(name, f);
-                }
+        const step = Math.max(1,Math.floor(points.length/300));
+        for (const p of points.filter((_,i)=>i%step===0)) {
+            for (const f of candidates) {
+                const name=f.properties.NAME_3||f.properties.name||f.properties.NAME_2||f.properties.GEN||'';
+                if (matched.has(name)) continue;
+                if (pointInGeometry(p.lat,p.lon,f.geometry)) matched.set(name,f);
             }
         }
-        return [...matched.entries()].map(([name, feature]) => ({ name, feature }));
+        return [...matched.entries()].map(([name,feature])=>({name,feature}));
     }
 
-    // ─── Main Search ───
+    function showResults(matches, kreise, blSet) {
+        $('resultsArea').style.display='flex';
+        $('plzCount').textContent=matches.length;
+        $('resultsList').innerHTML=matches.map(p=>'<span class="plz-chip"><span class="dot"></span>'+p.plz+(p.distance?' <span style="color:#888;font-size:.7rem">'+p.distance+'km</span>':'')+'</span>').join('');
+        $('kreiseList').innerHTML=kreise.length?'<label style="display:block;font-size:.7rem;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Landkreise</label>'+kreise.map(k=>'<span class="kreis-tag">'+k.name+'</span>').join(''):'';
+        $('statsKreise').textContent=kreise.length||'-';
+        $('statsBundeslaender').textContent=blSet.size;
+        $('statsRadius').textContent=currentMode==='radius'?rangeSlider.value+' km':'Bundesland';
+    }
+
+    function buildFilterPanel(matches) {
+        const blCounts={};
+        for (const p of matches) { const bl=plzBLMap[p.plz]; if(bl) blCounts[bl]=(blCounts[bl]||0)+1; }
+        const sorted=Object.entries(blCounts).sort((a,b)=>b[1]-a[1]);
+        if (!sorted.length) return;
+        const grid=$('filterBLGrid'); grid.innerHTML='';
+        sorted.forEach(([bl,count])=>{
+            const item=document.createElement('label');
+            item.className='filter-bl-item checked';
+            item.innerHTML='<input type="checkbox" checked value="'+bl+'"> <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+bl+'">'+bl+'</span><span class="filter-bl-count">'+count+'</span>';
+            item.querySelector('input').addEventListener('change',e=>item.classList.toggle('checked',e.target.checked));
+            grid.appendChild(item);
+        });
+    }
+
+    function applyBLFilter() {
+        const checked=new Set([...$('filterBLGrid').querySelectorAll('input:checked')].map(cb=>cb.value));
+        filteredPLZData=foundPLZData.filter(p=>{ const bl=plzBLMap[p.plz]; return !bl||checked.has(bl); });
+        markersLayer.clearLayers(); kreisLayer.clearLayers();
+        for (const p of filteredPLZData) L.circleMarker([p.lat,p.lon],{radius:4,color:'#f472b6',fillColor:'#f472b6',fillOpacity:.7,weight:1}).addTo(markersLayer);
+        const kreise=findKreiseForPoints(filteredPLZData);
+        const blSet=new Set(kreise.map(k=>k.feature.properties.NAME_1||'').filter(Boolean));
+        for (const k of kreise) L.geoJSON(k.feature,{style:{color:'#facc15',fillColor:'#facc15',fillOpacity:.12,weight:2}}).addTo(kreisLayer);
+        $('modeBadge').innerHTML='<span class="mode-badge">🎛 Gefiltert</span>';
+        showResults(filteredPLZData,kreise,blSet);
+        toast('Filter angewendet – '+filteredPLZData.length+' PLZ','#2a2600');
+    }
+
+    btnFilterToggle.addEventListener('click',()=>{
+        const v=filterPanel.classList.toggle('visible');
+        btnFilterToggle.classList.toggle('active',v);
+    });
+    $('btnFilterApply').addEventListener('click',()=>{ applyBLFilter(); filterPanel.classList.remove('visible'); btnFilterToggle.classList.remove('active'); });
+    $('btnFilterReset').addEventListener('click',()=>{ $('filterBLGrid').querySelectorAll('input').forEach(cb=>{ cb.checked=true; cb.closest('label').classList.add('checked'); }); });
+
     btnSearch.addEventListener('click', async () => {
-        const query = locationInput.value.trim();
+        const query=locationInput.value.trim();
         if (!query) { toast('Bitte einen Standort eingeben'); return; }
         if (!dataReady) { toast('Daten werden noch geladen…'); return; }
-
-        btnSearch.disabled = true;
-        loader.classList.add('active');
-        loaderText.textContent = 'Geocoding…';
-        markersLayer.clearLayers();
-        kreisLayer.clearLayers();
-        if (radiusCircle) { map.removeLayer(radiusCircle); radiusCircle = null; }
-
+        btnSearch.disabled=true; loader.classList.add('active'); loaderText.textContent='Geocoding…';
+        markersLayer.clearLayers(); kreisLayer.clearLayers();
+        if (radiusCircle) { map.removeLayer(radiusCircle); radiusCircle=null; }
+        filterPanel.classList.remove('visible'); btnFilterToggle.classList.remove('active');
+        currentMode='radius';
         try {
-            // 1) Geocode
-            const geo = await geocode(query);
-            const radiusKm = parseInt(rangeSlider.value);
-
-            // 2) Filter PLZ by distance (instant, client-side)
-            loaderText.textContent = 'PLZ werden gefiltert…';
-            await new Promise(r => setTimeout(r, 50)); // let UI update
-
-            const matches = [];
-            for (const p of plzDatabase) {
-                const dist = haversine(geo.lat, geo.lon, p.lat, p.lon);
-                if (dist <= radiusKm) {
-                    matches.push({ ...p, distance: Math.round(dist * 10) / 10 });
-                }
-            }
-            matches.sort((a, b) => a.distance - b.distance);
-            foundPLZData = matches;
-
-            // 3) Draw radius circle
-            radiusCircle = L.circle([geo.lat, geo.lon], {
-                radius: radiusKm * 1000,
-                color: '#38bdf8', fillColor: '#38bdf8', fillOpacity: 0.08,
-                weight: 2, dashArray: '8 4'
-            }).addTo(map);
-
-            // 4) Center marker
-            L.marker([geo.lat, geo.lon], {
-                icon: L.divIcon({
-                    className: '',
-                    html: '<div style="background:#ef4444;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(239,68,68,.6)"></div>',
-                    iconSize: [16, 16], iconAnchor: [8, 8]
-                })
-            }).addTo(markersLayer).bindPopup('<b>Suchzentrum</b><br>' + geo.display);
-
-            // 5) PLZ markers
-            for (const p of matches) {
-                L.circleMarker([p.lat, p.lon], {
-                    radius: 4, color: '#f472b6', fillColor: '#f472b6',
-                    fillOpacity: 0.7, weight: 1
-                }).addTo(markersLayer).bindPopup('<b>' + p.plz + '</b><br>' + p.distance + ' km');
-            }
-
-            // 6) Find Kreise (client-side point-in-polygon — fast!)
-            loaderText.textContent = 'Landkreise werden ermittelt…';
-            await new Promise(r => setTimeout(r, 50));
-
-            const kreise = findKreiseForPoints(matches);
-            const bundeslaender = new Set();
-
+            const geo=await geocode(query);
+            const radiusKm=parseInt(rangeSlider.value);
+            loaderText.textContent='PLZ werden gefiltert…'; await new Promise(r=>setTimeout(r,50));
+            const matches=[];
+            for (const p of plzDatabase) { const d=haversine(geo.lat,geo.lon,p.lat,p.lon); if(d<=radiusKm) matches.push({...p,distance:Math.round(d*10)/10}); }
+            matches.sort((a,b)=>a.distance-b.distance);
+            foundPLZData=filteredPLZData=matches;
+            radiusCircle=L.circle([geo.lat,geo.lon],{radius:radiusKm*1000,color:'#FFE600',fillColor:'#FFE600',fillOpacity:.06,weight:2,dashArray:'8 4'}).addTo(map);
+            L.marker([geo.lat,geo.lon],{icon:L.divIcon({className:'',html:'<div style="background:#ef4444;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(239,68,68,.6)"></div>',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(markersLayer).bindPopup('<b>Suchzentrum</b><br>'+geo.display);
+            for (const p of matches) L.circleMarker([p.lat,p.lon],{radius:4,color:'#f472b6',fillColor:'#f472b6',fillOpacity:.7,weight:1}).addTo(markersLayer).bindPopup('<b>'+p.plz+'</b><br>'+p.distance+' km');
+            loaderText.textContent='Landkreise werden ermittelt…'; await new Promise(r=>setTimeout(r,50));
+            const kreise=findKreiseForPoints(matches);
+            const blSet=new Set();
             for (const k of kreise) {
-                const props = k.feature.properties;
-                const bl = props.NAME_1 || props.state || props.BEZ || '';
-                if (bl) bundeslaender.add(bl);
-
-                L.geoJSON(k.feature, {
-                    style: {
-                        color: '#facc15', fillColor: '#facc15',
-                        fillOpacity: 0.12, weight: 2
-                    }
-                }).addTo(kreisLayer).bindPopup('<b>' + k.name + '</b>' + (bl ? '<br>' + bl : ''));
+                const bl=k.feature.properties.NAME_1||'';
+                if(bl) blSet.add(bl);
+                L.geoJSON(k.feature,{style:{color:'#facc15',fillColor:'#facc15',fillOpacity:.12,weight:2}}).addTo(kreisLayer).bindPopup('<b>'+k.name+'</b>'+(bl?'<br>'+bl:''));
             }
-
-            // 7) Update UI
-            $('resultsArea').style.display = 'flex';
-            $('plzCount').textContent = matches.length;
-            $('resultsList').innerHTML = matches.map(p =>
-                '<span class="plz-chip"><span class="dot"></span>' + p.plz +
-                ' <span style="color:#64748b;font-size:.72rem">' + p.distance + 'km</span></span>'
-            ).join('');
-
-            $('kreiseList').innerHTML = kreise.length
-                ? '<label style="display:block;font-size:.72rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Landkreise</label>' +
-                  kreise.map(k => '<span class="kreis-tag">' + k.name + '</span>').join('')
-                : '';
-
-            $('statsKreise').textContent = kreise.length;
-            $('statsBundeslaender').textContent = bundeslaender.size;
-            $('statsRadius').textContent = radiusKm + ' km';
-
-            map.fitBounds(radiusCircle.getBounds(), { padding: [30, 30] });
-
-        } catch (err) {
-            toast('Fehler: ' + err.message);
-            console.error(err);
-        } finally {
-            btnSearch.disabled = false;
-            loader.classList.remove('active');
-        }
+            buildFilterPanel(matches);
+            btnFilterToggle.style.display=blSet.size>1?'inline-flex':'none';
+            $('modeBadge').innerHTML='';
+            showResults(matches,kreise,blSet);
+            map.fitBounds(radiusCircle.getBounds(),{padding:[30,30]});
+        } catch(err) { toast('Fehler: '+err.message); console.error(err); }
+        finally { btnSearch.disabled=false; loader.classList.remove('active'); }
     });
 
-    // ─── CSV Download ───
-    $('btnCsv').addEventListener('click', () => {
-        if (!foundPLZData.length) return;
-        const header = 'PLZ,Latitude,Longitude,Distanz_km\n';
-        const rows = foundPLZData.map(p => p.plz + ',' + p.lat + ',' + p.lon + ',' + p.distance).join('\n');
-        const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'plz_radius_' + rangeSlider.value + 'km.csv';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+    $('btnCsv').addEventListener('click',()=>{
+        const data=filteredPLZData.length?filteredPLZData:foundPLZData;
+        if (!data.length) return;
+        const blob=new Blob([data.map(p=>p.plz+',').join('\n')],{type:'text/csv;charset=utf-8;'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url; a.download='plz_export_'+new Date().toISOString().slice(0,10)+'.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     });
 
 })();
